@@ -4,7 +4,20 @@ import { Movie } from './entities/movie.entity';
 @Injectable()
 export class MoviesService {
   // DB와의 쿼리를 다룰 것이다.
-  private DB: Movie[] = [];
+  private DB: Movie[] = [
+    {
+      id: 1,
+      title: 'Tenet',
+      year: 2020,
+      genres: ['Brain', 'exciting'],
+    },
+    {
+      id: 2,
+      title: '과속스캔들',
+      year: 2008,
+      genres: ['Funny'],
+    },
+  ];
 
   getAll(): Movie[] {
     return this.DB;
