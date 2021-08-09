@@ -1,46 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateMovieDto } from './dto/create-movie.dto';
 import { Movie } from './entities/movie.entity';
 
 @Injectable()
 export class MoviesService {
-  // DB와의 쿼리를 다룰 것이다.
-  private DB: Movie[] = [
-    {
-      id: 1,
-      title: 'Tenet',
-      year: 2020,
-      genres: ['Brain', 'exciting'],
-    },
-    {
-      id: 2,
-      title: '과속스캔들',
-      year: 2008,
-      genres: ['Funny'],
-    },
-  ];
+  private DB: Movie[] = [];
 
   getAll(): Movie[] {
     return this.DB;
   }
 
   getOne(id: string): Movie {
-    return this.DB.find((movie) => movie.id === parseInt(id));
+    const movie = this.DB.find((movie) => movie.id === parseInt(id));
+    if (!movie) {
+      throw new NotFoundException(`Movie not found with id : ${id}`);
+    }
+    return movie;
   }
 
-  addOne(data: Movie) {
-    this.DB.push({ ...data });
-    return true;
-  }
-
-  delete(id: string): boolean {
-    this.DB.filter((movie) => movie.id !== parseInt(id));
-    return true;
-  }
-
-  update(id: string, data: Omit<Movie, 'id'>): boolean {
+  addOne(data: CreateMovieDto) {
     this.DB.push({
-      id: parseInt(id),
+      id: this.DB.length + 1,
       ...data,
+    });
+    return true;
+  }
+
+  delete(id: string) {
+    this.getOne(id);
+    this.DB.filter((movie) => movie.id !== parseInt(id));
+  }
+
+  update(id: string, updatedData: CreateMovieDto) {
+    const movie = this.getOne(id);
+    this.delete(id);
+    this.DB.push({
+      ...movie,
+      ...updatedData,
     });
 
     return true;
